@@ -1,3 +1,4 @@
-bin/
+ibin/
 obj/
 [Pp]ackages/
+.solution.json
