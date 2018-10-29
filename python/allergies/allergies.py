@@ -24,7 +24,8 @@ class Allergies(object):
         match = []
 
         for index, allergy in enumerate(self.allergies):
-            value = pow(index, 2)
+            index += 1
+            value = pow(2, index) // 2
             if self.score & value == value:
                 match.append(allergy)
 
