@@ -8,19 +8,20 @@ def rotate(char):
 
 
 def encode(plain_text):
+    length = 0
     cipher = ''
 
-    for i, c in enumerate(plain_text):
-        if not c.isalpha():
+    for _, c in enumerate(plain_text):
+        if not c.isalnum():
             continue
+        
+        length += 1
         cipher += rotate(c)
-        if len(cipher) % 5 != 0:
-            continue
-        if i == len(plain_text):
-            continue
-        cipher += ' '
+        
+        if length % 5 == 0:
+            cipher += ' '
 
-    return cipher
+    return cipher.strip()
 
 
 def decode(ciphered_text):
