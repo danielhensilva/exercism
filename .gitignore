@@ -1,5 +1,6 @@
 bin/
 obj/
 [Pp]ackages/
+node_modules/
 .solution.json
 .idea/
