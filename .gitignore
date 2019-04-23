@@ -4,3 +4,4 @@ obj/
 node_modules/
 .solution.json
 .idea/
+.vscode/
