@@ -8,129 +8,71 @@ export default class WordSearch {
     const matches = {};
     const grid = this.grid;
 
+    const xLength = grid[0].length;
+    const yLength = grid.length;
+
     for (const word of words) {
 
-      const operations = [
-        searchLeftToRight,
-        searchRightToLeft,
-        searchTopToBottom,
-        searchBottomToTop,
-      ];
+      matches[word] = [
+        findLeftRight(word, grid, xLength, yLength),
+        findRightLeft(word, grid, xLength, yLength),
+      ].filter(x => Boolean(x))[0]
 
-      const result = findResult(
-        operations,
-        grid,
-        word);
-
-      if (result)
-        matches[word] = result;
     }
+
     return matches;
   }
 
 }
 
-function findResult(operations, grid, word) {
-  for (const operation of operations) {
-    const result = operation(grid, word);
-    if (result)
-      return result;
-  }
-}
+function findLeftRight(word, grid, xLength, yLength) {
+  for (let y = 0; y < yLength; y++) {
+    for (let x = 0; x < xLength; x++) {
 
-function reverseWord(word) {
-  return word.split('').reverse().join('');
-}
+      let match = true;
 
-function reverseArray(array) {
-  if (array) return array.reverse();
-}
+      for (let i = 0; i < word.length; i++) {
 
-function reverseStartArray(match) {
-  if (match) return {
-    start: reverseArray(match.start),
-    end: match.end
-  }
-}
+        if (grid[y][x + i] == word[i]) {
+          continue;
+        }
 
-function reverseEndArray(match) {
-  if (match) return {
-    start: match.start,
-    end: reverseArray(match.end)
-  }
-}
+        match = false;
+        break;
+      }
 
-function permuteStartEnd(match) {
-  if (match) return {
-    start: match.end,
-    end: match.start
-  };
-}
+      if (match) {
+        const start = [y + 1, x + 1];
+        const end = [y + 1, x + word.length];
+        return { start, end }
+      }
 
-function crossStartEnd(match) {
-  if (match) return {
-    start: [match.start[0], match.end[1]],
-    end: [match.end[0], match.start[1]],
-  }
-}
-
-function rotateGrid270Degrees(grid) {
-  const rotated = [];
-  for (let c = 0; c < grid[0].length; c++) {
-    rotated[c] = '';
-    for (let l = 0; l < grid.length; l++) {
-      rotated[c] += grid[l][c];
-    }
-  }
-  return rotated;
-}
-
-function startsWith(text, target, fromIndex) {
-  const subtext = text.substring(fromIndex);
-  const length = Math.min(subtext.length, target.length);
-  for (let i = 0; i < length ; i++) {
-    if (subtext[i] != target[i])
-      return false;
-  }
-  return true;
-}
-
-function searchSingleLine(line, target) {
-  const length = line.length - target.length + 1;
-  for (let i = 0; i < length; i++) {
-    if (startsWith(line, target, i)) return {
-      start: i + 1,
-      end: i + target.length
     }
   }
 }
 
-function searchBottomToTop(grid, word) {
-  const drow = reverseWord(word);
-  const match = searchTopToBottom(grid, drow);
-  return reverseStartArray(
-    permuteStartEnd(match));
-}
+function findRightLeft(word, grid, xLength, yLength) {
+  for (let y = 0; y < yLength; y++) {
+    for (let x = 0; x < xLength; x++) {
 
-function searchTopToBottom(grid, word) {
-  const rotated = rotateGrid270Degrees(grid);
-  const match = searchLeftToRight(rotated, word);
-  return reverseStartArray(match);
-}
+      let match = true;
 
-function searchRightToLeft(grid, word) {
-  const drow = reverseWord(word);
-  const match = searchLeftToRight(grid, drow);
-  return crossStartEnd(match);
-}
+      for (let i = 0; i < word.length; i++) {
 
-function searchLeftToRight(grid, word) {
-  for (let i = 0; i < grid.length; i++) {
-    const lineMatch = searchSingleLine(grid[i], word);
-    if (!lineMatch) continue;
-    return {
-      start: [i + 1, lineMatch.start],
-      end: [i + 1, lineMatch.end]
+        if (grid[y][x + i] == word[word.length - i - 1]) {
+          continue;
+        }
+
+        match = false;
+        break;
+      }
+
+      if (match) {
+        const start = [y + 1, x + word.length];
+        const end = [y + 1, x + 1];
+        return { start, end }
+      }
+
     }
   }
 }

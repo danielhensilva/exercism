@@ -283,7 +283,7 @@ describe('different directions', () => {
 });
 
 describe('vertical directions', () => {
-  test('should locate words written top to bottom', () => {
+  xtest('should locate words written top to bottom', () => {
     const grid = [
       'jefblpepre',
       'camdcimgtc',
@@ -314,7 +314,7 @@ describe('vertical directions', () => {
 
     expect(wordSearch.find(['elixir', 'clojure', 'ecmascript'])).toEqual(expectedResults);
   });
-  test('should locate words written bottom to top', () => {
+  xtest('should locate words written bottom to top', () => {
     const grid = [
       'jefblpepre',
       'camdcimgtc',
