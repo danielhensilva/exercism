@@ -344,12 +344,16 @@ describe('vertical directions', () => {
         start: [5, 9],
         end: [2, 9],
       },
+      tpircsamce: {
+        start: [10, 10],
+        end: [1, 10],
+      },
     };
     const wordSearch = new WordSearch(grid);
 
-    expect(wordSearch.find(['elixir', 'clojure', 'ecmascript', 'rust'])).toEqual(expectedResults);
+    expect(wordSearch.find(['elixir', 'clojure', 'ecmascript', 'rust', 'tpircsamce'])).toEqual(expectedResults);
   });
-  xtest('should locate words written top left to bottom right', () => {
+  test('should locate words written top left to bottom right', () => {
     const grid = [
       'jefblpepre',
       'camdcimgtc',
@@ -394,7 +398,7 @@ describe('vertical directions', () => {
       'java',
     ])).toEqual(expectedResults);
   });
-  xtest('should locate words written bottom right to top left', () => {
+  test('should locate words written bottom right to top left', () => {
     const grid = [
       'jefblpepre',
       'camdcimgtc',
@@ -445,7 +449,7 @@ describe('vertical directions', () => {
       'lua',
     ])).toEqual(expectedResults);
   });
-  xtest('should locate words written bottom left to top right', () => {
+  test('should locate words written bottom left to top right', () => {
     const grid = [
       'jefblpepre',
       'camdcimgtc',
@@ -501,7 +505,7 @@ describe('vertical directions', () => {
       'lisp',
     ])).toEqual(expectedResults);
   });
-  xtest('should locate words written top right to bottom left', () => {
+  test('should locate words written top right to bottom left', () => {
     const grid = [
       'jefblpepre',
       'camdcimgtc',
