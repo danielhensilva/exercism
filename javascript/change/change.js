@@ -9,10 +9,10 @@ export class Change {
       return [];
     }
 
-    const bestOption = best(coins, value);
+    const solution = execute(coins, value);
 
-    if (bestOption) {
-      return bestOption;
+    if (solution) {
+      return solution;
     }
 
     throw new Error(`The total ${value} cannot be represented in the given currency.`);
@@ -20,58 +20,69 @@ export class Change {
 
 }
 
-function best(coins, value) {
-  let best = null;
-  const options = generate(coins, value);
+function execute(coins, value) {
+  let partials = initialise(coins, value);
 
-  for (const option of options) {
-    if (option == null) {
-      continue;
-    }
-    if (best == null) {
-      best = option;
-      continue;
-    }
-    if (best.length > option.length) {
-      best = option;
-    }
+  let solution = match(partials, value);
+  if (solution) {
+    return solution.coins;
   }
 
-  return best;
+  while (true) {
+
+    if (partials.length == 0) {
+      return null;
+    }
+
+    const newPartials = [];
+
+    for (const coin of coins) {
+      for (const partial of partials) {
+
+        const newPartial = merge(partial, coin);
+
+        if (newPartial.sum == value)
+          return newPartial.coins;
+
+        if (newPartial.sum > value)
+          continue;
+
+        newPartials.push(newPartial);
+
+      }
+    }
+
+    let solution = match(partials, value);
+    if (solution) {
+      return solution;
+    }
+
+    partials = newPartials;
+  }
 }
 
-function generate(coins, value) {
-  const options = [];
-
-  const topDownCoins = [...coins];
-  while (topDownCoins.length) {
-    const option = calculate(topDownCoins, value);
-    options.push(option);
-    topDownCoins.pop();
-  }
-
-  const bottomUpCoins = [...coins].reverse();
-  while (bottomUpCoins.length) {
-    const option = calculate(bottomUpCoins, value);
-    options.push(option);
-    bottomUpCoins.shift();
-  }
-
-  return options;
+function initialise(coins, value) {
+  return coins
+    .filter(x => x <= value)
+    .map(x => ({
+      coins: [x],
+      sum: x
+    }));
 }
 
-function calculate(coins, value) {
-  const change = [];
+function merge(partial, coin) {
+  return {
+    coins: sort([coin, ...partial.coins]),
+    sum: coin + partial.sum
+  };
+}
 
-  coins.forEach(coin => {
-    while (value > 0 && value >= coin) {
-      value -= coin;
-      change.unshift(coin);
-    }
-  });
+function match(partials, value) {
+  return partials.find(x => x.sum == value);
+}
 
-  if (value == 0) {
-    return change;
-  }
+function sort(array) {
+  array.sort((a, b) => a - b);
+  return array;
 }
 
