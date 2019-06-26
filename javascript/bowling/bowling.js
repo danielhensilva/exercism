@@ -1,13 +1,23 @@
+/* eslint-disable no-console */
+
 export class Bowling {
   constructor() {
     this.frames = new FrameCollection();
   }
 
   roll(pins) {
+    if (this.frames.isOver()) {
+      throw new Error('Cannot roll after game is over');
+    }
+
     this.frames.roll(pins);
   }
 
   score() {
+    if (!this.frames.isOver()) {
+      throw new Error('Score cannot be taken until the end of the game');
+    }
+
     return this.frames.score();
   }
 }
@@ -43,21 +53,67 @@ class FrameCollection {
   currentFrame() {
     var frame;
 
-    if (this.frames.length == 0) {
+    if (this.frames.length === 0) {
       frame = new Frame();
       this.frames.push(frame);
       return frame;
     }
 
-    frame = this.frames[this.frames.length-1];
+    frame = this.getLastFrame();
 
     if (frame.isComplete()) {
       frame = new Frame();
       this.frames.push(frame);
-      return frame;
     }
 
     return frame;
+  }
+
+  isOver() {
+    if (this.frames.length < 10) {
+      return false;
+    }
+
+    const tenthFrame = this.getFrame(10);
+
+    if (!tenthFrame.isComplete()) {
+      return false;
+    }
+
+    if (tenthFrame.isRegular()) {
+      return true;
+    }
+
+    const eleventhFrame = this.getFrame(11);
+
+    if (eleventhFrame == null) {
+      return false;
+    }
+
+    if (tenthFrame.isSpare()) {
+      return eleventhFrame.throws() === 1;
+    }
+
+    if (tenthFrame.isStrike()) {
+
+      if (!eleventhFrame.isComplete()) {
+        return false;
+      }
+
+      if (eleventhFrame.isStrike()) {
+
+        const twelfthFrame = this.getFrame(12);
+
+        if (twelfthFrame == null) {
+          return false;
+        }
+
+        return twelfthFrame.throws() === 1;
+      }
+
+    }
+
+    return true;
   }
 
   score() {
@@ -65,12 +121,23 @@ class FrameCollection {
     console.log('---');
 
     for (let i = 0; i < 10; i++) {
-      console.log((i+1) + ' = ' + this.frames[i].toString());
+      console.log((i + 1) + ' = ' + this.frames[i].toString());
       value += this.frames[i].score();
     }
 
     console.log('=> ' + value);
     return value;
+  }
+
+  getFrame(number) {
+    if (number > this.frames.length) {
+      return null;
+    }
+    return this.frames[number - 1];
+  }
+
+  getLastFrame() {
+    return this.frames[this.frames.length - 1];
   }
 }
 
@@ -85,12 +152,20 @@ class Frame {
   roll(pins) {
     this.count++;
 
-    if (this.count == 1) {
+    if (this.count === 1) {
       this.firstThrow = pins;
     }
 
-    if (this.count == 2) {
+    if (this.count === 2) {
       this.secondThrow = pins;
+    }
+
+    if (pins < 0) {
+      throw new Error('Negative roll is invalid');
+    }
+
+    if (pins > 10 || this.scorePins() > 10) {
+      throw new Error('Pin count exceeds pins on the lane')
     }
   }
 
@@ -99,21 +174,39 @@ class Frame {
   }
 
   isStrike() {
-    return this.firstThrow == 10;
+    return this.firstThrow === 10;
   }
 
   isSpare() {
-    return this.firstThrow < 10 && this.firstThrow + this.secondThrow == 10;
+    return this.firstThrow < 10 && this.firstThrow + this.secondThrow === 10;
   }
 
   isComplete() {
-    return this.count == 2 || this.isStrike();
+    return this.count === 2 || this.isStrike();
+  }
+
+  isRegular() {
+    return !this.isSpecial();
+  }
+
+  isSpecial() {
+    return this.isSpare() || this.isStrike();
+  }
+
+  scorePins() {
+    return this.firstThrow + this.secondThrow;
+  }
+
+  scoreBonus() {
+    return this.bonus.reduce((prev, curr) => prev + curr, 0);
   }
 
   score() {
-    return this.firstThrow
-      + this.secondThrow
-      + this.bonus.reduce((prev, curr) => prev + curr, 0);
+    return this.scorePins() + this.scoreBonus();
+  }
+
+  throws() {
+    return this.count;
   }
 
   toString() {
