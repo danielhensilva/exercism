@@ -24,6 +24,9 @@ class SayTest(unittest.TestCase):
     def test_one_hundred(self):
         self.assertEqual(say(100), "one hundred")
 
+    def test_three_hundred(self):
+        self.assertEqual(say(300), "three hundred")
+
     # additional track specific test
     def test_one_hundred_twenty(self):
         self.assertEqual(say(120), "one hundred and twenty")
