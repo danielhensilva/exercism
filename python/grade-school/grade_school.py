@@ -9,14 +9,15 @@ class School(object):
 
     def roster(self):
         copied = self.student_grades[:]
-        copied.sort(lambda x: f'{x[1]:03} {x[0]}', reverse=True)
+        copied.sort(key=lambda x: f'{x[1]:03} {x[0]}')
         names = map(lambda x: x[0], copied)
         return list(names)
 
 
-    def grade(self, grade_number):
-        mapper = lambda x: x[0]
-        mapped = map(mapper, self.student_grades)
+    def grade(self, grade):
+        copied = self.student_grades[:]
+        filtered = filter(lambda x: x[1] == grade, copied)
+        mapped = map(lambda x: x[0], filtered)
         students = list(mapped)
         students.sort()
         return students
