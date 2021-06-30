@@ -5,39 +5,43 @@ export class InputCell {
   }
   setValue(value) {
     this.value = value;
+    this.onValueChanging();
     this.onValueChanged();
   }
   registerListener(listener) {
     this.listeners.push(listener);
+  }
+  onValueChanging() {
+    this.listeners.forEach(x => x.onValueChanging());
   }
   onValueChanged() {
     this.listeners.forEach(x => x.onValueChanged());
   }
 }
 
-export class ComputeCell {
+export class ComputeCell extends InputCell {
   constructor(inputCells, func) {
+    super();
     this.callbacks = [];
-    this.listeners = [];
     this.inputCells = inputCells;
     this.inputCells.forEach(x => x.registerListener(this));
     this.func = func;
     this.value = this.func(this.inputCells);
+    this.stable = this.value;
   }
   addCallback(callback) {
     this.callbacks.push(callback);
   }
   removeCallback(callback) {
-    throw new Error('Not implemented yet.');
+    this.callbacks = this.callbacks.filter(x => x !== callback);
   }
-  registerListener(listener) {
-    this.listeners.push(listener);
+  onValueChanging() {
+    this.value = this.func(this.inputCells);
+    this.listeners.forEach(x => x.onValueChanging());
   }
   onValueChanged() {
-    const newValue = this.func(this.inputCells);
-    if (newValue === this.value) return;
-    this.value = newValue;
-    this.listeners.forEach(x => x.onValueChanged());
+    if (this.stable === this.value) return;
+    this.stable = this.value;
     this.callbacks.forEach(x => x.onValueChanged(this));
   }
 }
